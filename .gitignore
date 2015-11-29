@@ -1,1 +1,10 @@
 desktop.ini
+*.bak
+*.qip
+*.rpt
+*.done
+*.summary
+*.pin
+*.jdi
+*.pof
+*.sof
