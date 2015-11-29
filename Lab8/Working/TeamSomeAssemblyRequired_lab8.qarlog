@@ -1,0 +1,21 @@
+Quartus II Archive log --	C:/Users/camca_000/Google Drive/SomeAssemblyRequiredProjectIntellivision/Lab8/Working/TeamSomeAssemblyRequired_lab8.qarlog
+
+Archive:	C:/Users/camca_000/Google Drive/SomeAssemblyRequiredProjectIntellivision/Lab8/Working/TeamSomeAssemblyRequired_lab8.qar
+Date:		Mon Oct 19 18:42:01 2015
+Quartus II 32-bit		11.1 Build 259 01/25/2012 SP 2.11 SJ Web Edition
+
+	=========== Files Selected: ===========
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/Lab8.qpf
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/Lab8.qsf
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/decoder32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/incremental_db/compiled_partitions/Lab8.db_info
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/mux32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/reg16.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/reg32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/regFile.do
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/Lab8/regFile.vhdl
+c:/altera/11.1sp2/quartus/bin/assignment_defaults.qdf
+	======= Total: 10 files to archive =======
+
+	================ Status: ===============
+All files archived successfully.

@@ -1,0 +1,31 @@
+Part 1:
+  1. Control flags are data that are passed into the control unit that decide the behavior of the operation being
+      performed, they also provide state information about the processor's last operation (NZVC).
+
+  2. An add instruction will set alu_op, a_inv, b_inv and write enable.
+
+Part 2:
+  1. With the statement END IF
+
+  2. To prevent lockouts and to ake sure that instructions are properly timed.
+   By keeping actions on the rising edge of the clock we prevent large scale data loss or misordered instructions.
+
+   3. IF(rising_edge(Clock)) THEN
+
+   4.
+	  IF(x = "01") THEN
+		  y <= "00";
+	  ELSIF(x = "10") THEN
+		  y <= "01";
+	  ELSE THEN
+		  x <= "00";
+	  END IF;
+
+Part 3:
+  1. The ALU.
+
+  2. alu_op = "01"
+
+  3. Then the stage is reset to 1.
+
+  4. rf_write, which is the write enable signal.

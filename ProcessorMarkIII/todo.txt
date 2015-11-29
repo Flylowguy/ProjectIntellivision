@@ -1,0 +1,20 @@
+Components to be modified:
+[]Memory
+[x]PC
+[x]immediate
+Datapath changes:
+[]MuxC (provided in memory files)
+[]InstrutionAddressGenerator
+[]Flags to signals
+New Additions:
+[]PC
+[]PC_Temp
+[]Adder for PC
+ControlUnit Changes:
+[x]lw
+[x]sw
+[x]addi
+[x]b
+[x]bl
+[]cmp
+[x]jr

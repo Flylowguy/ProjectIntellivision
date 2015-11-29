@@ -1,0 +1,36 @@
+Quartus II Archive log --	C:/Users/camca_000/Google Drive/SomeAssemblyRequiredProjectIntellivision/ProcessorImplementation/ProcessorImplementation.qarlog
+
+Archive:	C:/Users/camca_000/Google Drive/SomeAssemblyRequiredProjectIntellivision/ProcessorImplementation/ProcessorImplementation.qar
+Date:		Fri Nov 06 14:17:55 2015
+Quartus II 32-bit		11.1 Build 259 01/25/2012 SP 2.11 SJ Web Edition
+
+	=========== Files Selected: ===========
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/ALU.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/BuffReg32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/IR32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/ProcessorImplementation.qpf
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/ProcessorImplementation.qsf
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/and32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/controlUnit.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/decoder32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/fullAdder.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/immediate.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/incremental_db/compiled_partitions/ProcessorImplementation.db_info
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/mux2.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/mux3.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/mux32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/mux4.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/not32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/or32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/processor.do
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/processor.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/rcAdder.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/reg32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/regFile.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/xor32.vhdl
+C:/Users/camca_000/Documents/Homework/Fall2015/CSCE230/ProcessorImplementation/zeroFlag.vhdl
+c:/altera/11.1sp2/quartus/bin/assignment_defaults.qdf
+	======= Total: 25 files to archive =======
+
+	================ Status: ===============
+All files archived successfully.

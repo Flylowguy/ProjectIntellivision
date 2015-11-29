@@ -1,0 +1,17 @@
+vsim rcAdder
+view wave
+add wave aIn
+add wave bIn
+add wave cIn
+add wave f
+add wave c30
+add wave c31
+
+force aIn 00000000000000001111111111111111 0
+force bIn 01111111111111110000000000000000 0
+force cIn 0 0
+force aIn 00000000001111111111111111000000 30
+force bIn 11111111101111110000000000000000 30
+force cIn 1 30
+
+run 90

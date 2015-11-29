@@ -1,0 +1,415 @@
+\documentclass[]{article}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage[margin=0.5in]{geometry}
+\lstset{
+	language=VHDL,
+	basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+	numbers=left,                   % where to put the line-numbers
+	numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+	stepnumber=0,                   % the step between two line-numbers. If it is 1 each line will be numbered
+	numbersep=5pt,                  % how far the line-numbers are from the code
+	backgroundcolor=\color{white},  % choose the background color. You must add 			\usepackage{color}
+	showspaces=false,               % show spaces adding particular underscores
+	showstringspaces=false,         % underline spaces within strings
+	showtabs=false,                 % show tabs within strings adding particular underscores
+	tabsize=2,          % sets default tabsize to 2 spaces
+	captionpos=b,           % sets the caption-position to bottom
+	breaklines=true,        % sets automatic line breaking
+	breakatwhitespace=false,    % sets if automatic breaks should only happen at whitespace
+	escapeinside={\%*}{*)},          % if you want to add a comment within your code}
+	  basicstyle=\footnotesize, frame=tb,
+	  xleftmargin=.15\textwidth, xrightmargin=.15\textwidth
+}
+\begin{document}
+\begin{center}
+	{\LARGE
+		\textbf{
+		CSCE 230 Honors Project Specification
+		}
+	}
+\end{center}
+
+{\Large
+	\textbf{
+		Design Specification Overview:
+	}
+}
+
+\noindent You are going to design and implement a basic processor, with optional extensions to it, on the DE1 board following the scheme(s) described in Chapter 5 of the textbook.  The ISA you will implement resembles a subset of the NIOS II architecture and includes some features that are unique to ARM.
+
+\begin{center}
+	\begin{itemize}
+		\item All instructions will be 32 bits wide
+		\item The data will be 32 bits wide (32 bit registers)
+		\item The processor will communicate with the memory hierarchy through a processor-memory interface that will be provided to you
+		\item There are 32 registers in the register file and they are each 32 bits wide.  The register file will have one write and two read ports and is designed as the one you created in Lab 8.  The registers are numbered R0-R31, with R0 being a constant zero, R30 being the link register, and R31 being used as the stack pointer
+		\item The processor uses memory mapped I/O.  At a minimum you will implement polling based I/O with all of the basic IO pins: Red/Green leds, 4 hex displays, push buttons, and switches
+		\item The program counter (PC) is not part of the register file, but a separate register, as it is in MIPS architecture (not ARM).  The additional registers, past R0-R31, include the PC (32-bits wide) and the processor status register PS (at least 4-bits wide).  PS has the following:
+			\begin{itemize}
+				\item Four bits to store the N,Z,V,C flags that are produced by the ALU.
+				\item The following bits if you choose to implement interrupts
+					\begin{itemize}
+						\item One bit to indicate processor mode (user or interrupt)
+						\item One bit for interrupts enable (IE)
+						\item The bits for the current priority level, if you choose to implement priority interrupts.
+					\end{itemize}
+			\end{itemize}
+		\item By borrowing a characteristic of ARM, most instructions can execute conditionally based upon the condition specified and the values of the four flags in the PS
+		\item You will have to implement a certain set of instructions, specified below.
+	\end{itemize}
+\end{center}
+\pagebreak
+
+{\Large
+	\textbf{
+		Instruction Formats:
+	}
+}
+
+\noindent The basic instructions used in the processor you will make are of four types (R,D,B,J).  In the following, a subset of the instructions defined for the processor are shown.
+\newline
+
+\noindent \textbf{NOTE:} The following ISA leverages advantages of various existing ISAs. More specifically, most instructions resemble MIPS instructions but properties from ARM instructions are also used.
+\newline
+
+\noindent (R) Register-Register types: Arithmetic, logic, shift, compare, jump register, and more
+
+\begin{tabular}{|ccccc|ccccc|ccccc|}\hline
+  &  & RegS &  &  &  &  & RegT &  &  &  &  & RegD &  &\\\hline
+31&30&29&28&27&26&25&24&23&22&21&20&19&18&17\\\hline
+\end{tabular}
+
+\begin{tabular}{|ccccccc|c|cccc|ccccc|}\hline
+	&  & & OPX & &  & & S & & & COND & & & & OP & & \\\hline
+16&15&14&13&12&11&10&9&8&7&6&5&4&3&2&1&0\\\hline
+\end{tabular}
+
+\begin{figure}[ht!]
+	\begin{center}
+	\end{center}
+\end{figure}
+
+
+\noindent (D) Data transfer (between memory and CPU) types: load, store, add/sub immediate, and more
+
+\begin{tabular}{|ccccc|ccccc|ccccc|}\hline
+  &  & RegS &  &  &  &  & RegD &  &  &  &  & Immediate &  &\\\hline
+31&30&29&28&27&26&25&24&23&22&21&20&19&18&17\\\hline
+\end{tabular}
+
+\begin{tabular}{|ccccccc|c|cccc|ccccc|}\hline
+	&  & & Immediate & &  & & S & & & COND & & & & OP & & \\\hline
+16&15&14&13&12&11&10&9&8&7&6&5&4&3&2&1&0\\\hline
+\end{tabular}
+
+\noindent (B) Branch types: Branch and branch and link instructions.  Branches are PC relative but can be conditionally executed as in ARM.  The immediate value will not need to be sign extended as it is already 16 bits.
+
+\begin{tabular}{|ccccccccccccccc|}\hline
+  &  &  &  &  &  &  & Immediate & &  &  &  & &  &\\\hline
+31&30&29&28&27&26&25&24&23&22&21&20&19&18&17\\\hline
+\end{tabular}
+
+\begin{tabular}{|cccccccc|cccc|ccccc|}\hline
+	&  & & Immediate & &  & & & & COND & & & & & OP & & \\\hline
+16&15&14&13&12&11&10&9&8&7&6&5&4&3&2&1&0\\\hline
+\end{tabular}
+
+\noindent (J) Jump types: Jump, jump and link, and load immediate instructions.
+
+\begin{tabular}{|ccccccccccccccc|}\hline
+  &  &  &  &  &  &  & Immediate & &  &  &  & &  &\\\hline
+31&30&29&28&27&26&25&24&23&22&21&20&19&18&17\\\hline
+\end{tabular}
+
+\begin{tabular}{|cccccccccccc|ccccc|}\hline
+	&  & & & Immediate &  & & & & & & & & & OP & & \\\hline
+16&15&14&13&12&11&10&9&8&7&6&5&4&3&2&1&0\\\hline
+\end{tabular}
+
+\pagebreak
+
+{\Large
+	\textbf{
+		R-Type:
+	}
+}
+
+\noindent These instructions include add, sub, and, or, xor, sll, cmp, and jr
+
+\begin{center}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}\cline{1-9}
+	Instruction & Add & Sub & AND & OR & XOR & sll & cmp & jr \\\cline{1-9}\hfill
+	OpCode(in binary) & 0000 & 0000  & 0000 & 0000 & 0000 & 0100 & 0101 & 0110 \\\cline{1-9}\hfill
+	Opx(in binary) & 0000000 & 0000001 & 0000011 & 0000010 & 0000100 &  &  & \\\cline{1-9}
+	\end{tabular}
+\end{center}
+\noindent All of these instructions, except jr, can set the NCVZ flags.
+
+add\\
+\begin{tabular}{c|c}\hline
+	Instruction & add\\\hline
+	Operation & $RegD \leftarrow RegS + RegT$\\\hline
+	Assembler Syntax & add RegD, RegS, RegT\\\hline
+	Description & Calculates the sum of RegS and RegT then stores the result in RegD.\\\hline
+\end{tabular}
+\vspace{1.5cm}
+
+sub\\
+\begin{tabular}{c|c}\hline
+	Instruction & sub\\\hline
+	Operation & $RegD \leftarrow RegS - RegT$\\\hline
+	Assembler Syntax & sub RegD, RegS, RegT\\\hline
+	Description & Calculates the difference between RegS and RegT then stores the result in RegD.\\\hline
+\end{tabular}
+
+AND\\
+\begin{tabular}{c|c}\hline
+	Instruction & AND\\\hline
+	Operation & $RegD \leftarrow RegS*RegT$\\\hline
+	Assembler Syntax & and RegD, RegS, RegT\\\hline
+	Description & Calculates the value of (RegS and RegT) then stores the result in RegD.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+OR\\
+\begin{tabular}{c|c}\hline
+	Instruction & OR\\\hline
+	Operation & $RegD \leftarrow RegS + RegT$\\\hline
+	Assembler Syntax & or RegD, RegS, RegT\\\hline
+	Description & Calculates (RegS or RegT) then stores the result in RegD.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+XOR\\
+\begin{tabular}{c|c}\hline
+	Instruction & XOR\\\hline
+	Operation & $RegD \leftarrow RegS \bigoplus RegT$\\\hline
+	Assembler Syntax & xor RegD, RegS, RegT\\\hline
+	Description & Calculates RegS xor RegT then stores the result in RegD.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+sll\\
+\begin{tabular}{c|c}\hline
+	Instruction & sll\\\hline
+	Operation & $RegD \leftarrow RegS <<(RegT)$\\\hline
+	Assembler Syntax & sll RegD, RegS, RegT\\\hline
+	Description & Calculates the slide left of RegS by RegT positions then stores the result in RegD.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+	cmp\\
+	\begin{tabular}{c|c}\hline
+		Instruction & cmpXX\\\hline
+		Operation & $RegD \leftarrow RegS XX RegT$\\\hline
+		Assembler Syntax & cmpXX RegD, RegS, RegT\\\hline
+		Description & Calculates the indicated comparison (XX) of RegS with RegT then stores the result in RegD.\\\hline
+	\end{tabular}\vspace{1.5cm}
+
+	jr\\
+	\begin{tabular}{c|c}\hline
+		Instruction & jr\\\hline
+		Operation & $PC \leftarrow RegS$\\\hline
+		Assembler Syntax & jr RegS\\\hline
+		Description & Places the value of RegS into the PC register.\\\hline
+	\end{tabular}\vspace{1.5cm}
+\pagebreak
+
+
+
+\pagebreak
+
+{\Large
+	\textbf{
+		D-Type:
+	}
+}
+
+\noindent These instructions include load word, store word, add immediate, and set interrupt.
+
+\begin{center}
+	\begin{tabular}{|c|c|c|c|c|}\cline{1-5}
+	Instruction & lw & sw & addi & si\\\cline{1-5}\hfill
+	OpCode(in binary) & 0111 & 1001 & 1000 & 1010 \\\cline{1-5}
+	\end{tabular}\vspace{1.5cm}
+\end{center}
+
+\noindent All of these instructions can set the NCVZ flags.
+
+lw\\
+\begin{tabular}{c|c}\hline
+	Instruction & lw\\\hline
+	Operation & $RegD \leftarrow \#IMM(RegS)$\\\hline
+	Assembler Syntax & lw RegD, \#IMM(RegS)\\\hline
+	Description & Loads memory address stored in RegS and incremented by an immediate value into RegD.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+sw\\
+\begin{tabular}{c|c}\hline
+	Instruction & sw\\\hline
+	Operation & $\#IMM(RegD) \leftarrow RegS$\\\hline
+	Assembler Syntax & sw RegS, \#IMM(RegD)\\\hline
+	Description & Stores the value of RegS into the memory location RegD incremented by an immediate value.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+addi\\
+\begin{tabular}{c|c}\hline
+	Instruction & addi\\\hline
+	Operation & $RegD \leftarrow RegS + \#IMM$\\\hline
+	Assembler Syntax & addi RegD, RegS, \#IMM\\\hline
+	Description & Add RegS and \#IMM and store into RegD.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+si\\
+\begin{tabular}{c|c}\hline
+	Instruction & si\\\hline
+	Operation & $IPS \leftarrow RegD$\\\hline
+	Assembler Syntax & si RegS\\\hline
+	Description & Places RegS into the interrupt status register.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+
+\pagebreak
+
+{\Large
+	\textbf{
+		B-Type:
+	}
+}
+
+\noindent These instructions include Branch and Branch and link.
+
+\begin{center}
+	\begin{tabular}{|c|c|c|}\cline{1-3}
+	Instruction & b & bal \\\cline{1-3}\hfill
+	OpCode(in binary) & 1011 & 1100 \\\cline{1-3}
+	\end{tabular}\vspace{1.5cm}
+\end{center}
+
+\noindent These instructions do not set the NCVZ flags.
+
+b\\
+\begin{tabular}{c|c}\hline
+	Instruction & b\\\hline
+	Operation & $PC \leftarrow PC + 4 + \#IMM$\\\hline
+	Assembler Syntax & bXX \#conditional label\\\hline
+	Description & Checks condition (XX) against conditional value and branches to label.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+bal\\
+\begin{tabular}{c|c}\hline
+	Instruction & bal\\\hline
+	Operation & $LR \leftarrow PC + 4 + \#IMM$\\&$PC \leftarrow PC + 4 + \#IMM$\\\hline
+	Assembler Syntax & bal \#label\\\hline
+	Description & Branches to the label and stores current location into link register.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+
+\pagebreak
+
+{\Large
+	\textbf{
+		J-Type:
+	}
+}
+
+\noindent These instructions include jump, jump and link, and load immediate
+
+\begin{center}
+	\begin{tabular}{|c|c|c|c|}\cline{1-4}
+	Instruction & j & jal & li \\\cline{1-4}\hfill
+	OpCode(in binary) & 1101 & 1110 & 1111 \\\cline{1-4}
+	\end{tabular}\vspace{1.5cm}
+\end{center}
+
+j\\
+\begin{tabular}{c|c}\hline
+	Instruction & j\\\hline
+	Operation & $PC \leftarrow $location of label\\\hline
+	Assembler Syntax & j label\\\hline
+	Description & Puts the location of label into the PC register.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+jal\\
+\begin{tabular}{c|c}\hline
+	Instruction & jal\\\hline
+	Operation & $LR \leftarrow PC + 4$\\&$PC \leftarrow $location of label\\\hline
+	Assembler Syntax & jal label\\\hline
+	Description & Puts the location of label into the PC register and stores the next command into the link register.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+li\\
+\begin{tabular}{c|c}\hline
+	Instruction & li\\\hline
+	Operation & $PC \leftarrow \#IMM$\\\hline
+	Assembler Syntax & li \#IMM\\\hline
+	Description & Puts the immediate value into the PC register.\\\hline
+\end{tabular}\vspace{1.5cm}
+
+
+
+\pagebreak
+
+{\Large
+	\textbf{
+		Conditional execution of instructions - ARM-like extension:
+	}
+}
+
+\noindent The R, D, and B type implement a condition code called Cond.  When this is specified the instruction will only execute if the corresponding condition flag(s) is/are set.  How to set these flags will be specified later.
+
+\noindent Conditional execution is an efficient way of generating various instructions from a basic instructions.  The most common example is branch.  We can specify the COND part of the branch:
+
+
+\noindent and have beq, bne, bgt, blt, etc...
+
+\noindent You can view the condition code as an extension of the opCode that defines distinct instruction sub-types.  Due to its nature, conditional execution depends on the previous instructions that sets the condition flags, i.e., Branch\_if\_[R2-R3] LABEL would be implemented by TWO instructions.  The first will compare R2 and R3 and set the NCVZ flags and the second instruction will branch if the Z flag is set.
+
+\noindent Each condition code combination is also labeled by a two character string.  These can be appended to the instrcution in assembly, e.g., beq means branch if Z is set.  The below table shows the possible values of the Cond bits and what they mean:
+\begin{center}
+	\begin{tabular}{|c|c|c|c|}\cline{1-4}
+		Cond bits & Char string & Meaning & Flags\\\cline{1-4}\hfill
+		0000 & AL & Always & \\\cline{1-4}\hfill
+		0001 & NV & Never & \\\cline{1-4}\hfill
+		0010 & EQ & Equal & Z\\\cline{1-4}\hfill
+		0011 & NE & Not Equal & NOT Z\\\cline{1-4}\hfill
+		0100 & VS & Overflow & V\\\cline{1-4}\hfill
+		0101 & VC & No Overflow & NOT V\\\cline{1-4}\hfill
+		0110 & MI & Negative & N\\\cline{1-4}\hfill
+		0111 & PL & Postive or Zero & NOT N \\\cline{1-4}\hfill
+		1000 & CS & Unsigned higher or same &  C\\\cline{1-4}\hfill
+		1001 & CC & Unsigned lower & NOT C\\\cline{1-4}\hfill
+		1010 & HI & Unsigned Higher & C AND (NOT Z)\\\cline{1-4}\hfill
+		1011 & LS & Unsigned Lower or same & (NOT C) OR Z\\\cline{1-4}\hfill
+		1100 & GT & Greather than & (NOT Z) AND ((N AND V) OR ((NOT N) AND (NOT V)))\\\cline{1-4}\hfill
+		1101 & LT & Less than & (N AND (NOT V)) OR ((NOT Z) AND V)\\\cline{1-4}\hfill
+		1110 & GE & Greater than or equal & (N AND V) OR ((NOT N) AND (NOT V)\\\cline{1-4}\hfill
+		1111 & LE & Less than or equal & Z OR (((N AND (NOT V)) OR ((NOT Z) AND V)))\\\cline{1-4}
+	\end{tabular}
+\end{center}
+
+\noindent To use a condition code, append the corresponding two character code to the assembling instruction.  For example, to execute an R-type addition instruction always, the assembly instruction would be:
+\begin{lstlisting}
+	addal R1, R2, R3
+\end{lstlisting}
+\noindent This will always add R2 + R3 and store that into R1.
+\newline
+
+\noindent To branch if R2 is not equal to R3, this code would look like:
+\begin{lstlisting}
+	cmp R2, R3
+	bne LABEL
+\end{lstlisting}
+\noindent The cmp instruction will compare R2 and R3 and set the flags based on R2 - R3.  If the Z flag is zero, then the branch will modify the PC so that it is now at LABEL.  The cmp instruction uses the S bit of the instruction to set the flags.
+\newline\newline
+
+{\Large
+	\textbf{
+		Set Bit:
+	}
+}
+
+\noindent The R and D type instructions have an 'S' bit (bit 15) that indicates whether the PS register should update its value of the flags.  If the S bit is set then the given instruction will update the condition flags, NCVZ, based on the result of the instruction operation.  Append an S to an instruction in order for it to set the flags (cmp should always set the flags but other instructions can as well).
+
+\pagebreak
+
+
+\end{document}
