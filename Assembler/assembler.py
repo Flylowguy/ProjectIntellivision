@@ -37,7 +37,7 @@ temp = ''
 for i in range(0,31): # this loop creates a list of all the registers (for identification)
     temp = 'r' + str(i)
     reg[temp] = '{0:05b}'.format(i)
-global knownSymbols = [Rtype,Dtype,Btype,Jtype,reg]#list containing all known/predefined symbols
+global knownSymbols = [Rtype,Dtype,Btype,Jtype]#list containing all known/predefined symbols
 
 
 
@@ -47,24 +47,32 @@ def pass1(fileName):
     symbolTable = {} #a dictionary(IE Key=> value where keys can be anything)
     myfile = open(fileName,'r')
     lineArgs = []
+    count = 0
     for line in myfile:
+        count++
         lineArgs = re.split('[ ,]',line)# splits a line by a regex
-        for item in lineArgs: # if not a recognized sybol make an entry in the SymbolTable
-            inSet = False
-            for L in knownSymbols: #goes through each dict of Known symbols
-                if(item in L):# if item in dict
-                    inSet = True
-            if(!inSet):
-                
-            
-       
-        
+        # if not a recognized sybol make an entry in the SymbolTable
+        #this will only find where the actual labels are, not where they are in
+        #other insturctions. Only where labels begin.
+        inSet = False
+        for L in knownSymbols: #goes through each dict of Known symbols
+            if(lineArgs[0] in L):# if item in dict
+                inSet = True
+        if(!inSet):
+            symbolTable[lineArgs[0]] = count 
+    myfile.close()
     return symbolTable
 # TODO helper method for second pass
 # takes in symbol table of pass1 and uses it to create the .o file
 # IE Fully assembles it.
 def pass2(fileName, sybolTable): 
-    return 0
+    myfile  = open(fileName, "r")
+    nl = len(fileName)
+    outName = fileName[:nl-1]+".o" #creates new file for write out.
+    outfile = open(outName,"w")
+    #todo process the information and create the binary instructions to the out file.
+    
+    
 
 
 #TODO call that will asseble the whole file
