@@ -9,56 +9,56 @@
 import sys
 import re
 #These are file wide constants/global identifiers
-global Rtype = {'add' = '00000',
-                'sub' = '00000',
-                'and' = '00000',
-                'or' = '00000',
-                'xor' = '00000',
-                'sll' = '00100',
-                'cmp' = '00101',
-                'jr' = '00110'}
-global opx = {'add' = '0000000',
-              'sub' = '0000001',
-              'and' = '0000011',
-              'or' = '0000010',
-              'xor' = '0000100',
-              'sll' = '0000000',
-                'cmp' = '0000000',
-                'jr' = '0000000'}
-global Dtype = {'lw' = '00111',
-                'sw' = '01001',
-                'addi' = '01000',
-                'si' = '01010'}
-global Btype = {'b' = '01011',
-                'bal' = '01100'}
-global Jtype = {'j' = '01101',
-                'jal' = '01110',
-                'li' = '01111'}
-global Cond = { '' = '0000',
-                'al' ='0000',
-                'nv' ='0001',
-                'eq' ='0010',
-                'ne' ='0011',
-                'vs' ='0100',
-                'vc' ='0101',
-                'mi' ='0110',
-                'pl' ='0111',
-                'cs' ='1000',
-                'cc' ='1001',
-                'hi' ='1010',
-                'ls' ='1011',
-                'gt' ='1100',
-                'lt' ='1101',
-                'ge' ='1110',
-                'le' ='1111'
+Rtype = {'add' : '00000',
+         'sub' : '00000',
+         'and' : '00000',
+         'or' : '00000',
+         'xor' : '00000',
+         'sll' : '00100',
+         'cmp' : '00101',
+         'jr' : '00110'}
+opx = {'add' : '0000000',
+              'sub' : '0000001',
+              'and' : '0000011',
+              'or' : '0000010',
+              'xor' : '0000100',
+              'sll' : '0000000',
+                'cmp' : '0000000',
+                'jr' : '0000000'}
+Dtype = {'lw' : '00111',
+                'sw' : '01001',
+                'addi' : '01000',
+                'si' : '01010'}
+Btype = {'b' : '01011',
+                'bal' : '01100'}
+Jtype = {'j' : '01101',
+                'jal' : '01110',
+                'li' : '01111'}
+Cond = { '' : '0000',
+                'al' :'0000',
+                'nv' :'0001',
+                'eq' :'0010',
+                'ne' :'0011',
+                'vs' :'0100',
+                'vc' :'0101',
+                'mi' :'0110',
+                'pl' :'0111',
+                'cs' :'1000',
+                'cc' :'1001',
+                'hi' :'1010',
+                'ls' :'1011',
+                'gt' :'1100',
+                'lt' :'1101',
+                'ge' :'1110',
+                'le' :'1111'
                 }
-global reg = {}
+reg = {}
 temp = ''
 for i in range(0,31): # this loop creates a list of all the registers (for identification)
     temp = 'r' + str(i)
     reg[temp] = '{0:05b}'.format(i)
     temp = ''
-global knownSymbols = [Rtype,Dtype,Btype,Jtype]#list containing all known/predefined symbols
+knownSymbols = [Rtype,Dtype,Btype,Jtype]#list containing all known/predefined symbols
 
 
 
@@ -70,7 +70,7 @@ def pass1(fileName):
     lineArgs = []
     count = 0
     for line in myfile:
-        count++
+        count +=1
         lineArgs = re.split('[ ,]',line)# splits a line by a regex
         # if not a recognized sybol make an entry in the SymbolTable
         #this will only find where the actual labels are, not where they are in
@@ -79,7 +79,7 @@ def pass1(fileName):
         for L in knownSymbols: #goes through each dict of Known symbols
             if(lineArgs[0] in L):# if item in dict
                 inSet = True
-        if(!inSet):
+        if( not inSet):
             symbolTable[lineArgs[0]] = count 
     myfile.close()
     return symbolTable
@@ -94,7 +94,7 @@ def pass2(fileName, symbolTable):
     count = 0
     outLine = ""
     for line in myfile:
-        count++
+        count += 1
         lineArgs = re.split('[ ,]',line);
         if(lineArgs[0] in symbolTable):
             if(lineArgs[1] in Rtype):
@@ -103,7 +103,7 @@ def pass2(fileName, symbolTable):
                     outLine = reg[lineArgs[3]] + '00000'+'00000' + opx[lineArgs[1]] + '0'
                 else:
                     outLine = reg[lineArgs[4]] + reg[lineArgs[5]] + reg[lineArgs[3]] + opx[lineArgs[1]]
-                    if(lineArgs[1] = 'cmp'): #Sets the s bit
+                    if(lineArgs[1] == 'cmp'): #Sets the s bit
                         outLine += '1'
                     else:
                         outLine += '0'
@@ -139,7 +139,7 @@ def pass2(fileName, symbolTable):
                     
                 else:
                     outLine = reg[lineArgs[3]] + reg[lineArgs[4]] + reg[lineArgs[2]] + opx[lineArgs[0]]
-                    if(lineArgs[0] = 'cmp'): #Sets the s bit
+                    if(lineArgs[0] == 'cmp'): #Sets the s bit
                         outLine += '1'
                     else:
                         outLine += '0'
@@ -162,7 +162,11 @@ def pass2(fileName, symbolTable):
     
                 # Are we even doing SI?
             elif(lineArgs[0] in Btype):
-            elif(lineArgs[0] in Jtype):
+                #b al LABEL or Number
+                #bal al Label or Number
+                if(lineArgs[2] in symbolTable):
+                    outLine = '{0:023b}'.format(symbolTable[lineArgs[2]])
+            #elif(lineArgs[0] in Jtype): TODO J types
             else: # If the command is blank or not recognized then introduce a NO OP
                 outLine = '0' * 32
 
