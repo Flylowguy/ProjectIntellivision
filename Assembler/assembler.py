@@ -30,7 +30,7 @@ Dtype = {'lw' : '00111',
                 'addi' : '01000',
                 'si' : '01010'}
 Btype = {'b' : '01011',
-                'bal' : '01100'}
+        'bal' : '01100'}
 Jtype = {'j' : '01101',
                 'jal' : '01110',
                 'li' : '01111'}
@@ -93,9 +93,10 @@ def pass2(fileName, symbolTable):
     outFile = open(outName,'w')
     count = 0
     outLine = ""
-    for line in myfile:
+    for cline in myfile:
         count += 1
-        lineArgs = re.split('[ ,]',line);
+        line = cline.replace('\n','')
+        lineArgs = re.split('[ ,]',line)
         if(lineArgs[0] in symbolTable):
             if(lineArgs[1] in Rtype):
                 if(lineArgs[1] == 'jr'):
@@ -113,8 +114,8 @@ def pass2(fileName, symbolTable):
                 #label lw al r3,0(r4)
                 
                 if(lineArgs[1] == 'lw' or lineArgs[1] == 'sw'  ):
-                    process = re.split('[(]',lineArgs[4][:len(lineArgs[4]-1)])
-                    outLine = reg[process[1]] + reg(lineArgs[3]) + '{0:012b}'.format(int(process[0]))
+                    process = re.split('[()]',lineArgs[4][:len(lineArgs[4])-1])
+                    outLine = reg[process[1]] + reg[lineArgs[3]] + '{0:012b}'.format(int(process[0]))
                     outLine += '0'
                     outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
                 elif(lineArgs[1] == 'addi'):
@@ -123,12 +124,23 @@ def pass2(fileName, symbolTable):
                     outLine += '0'
                     outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
     
-                # Are we even doing SI?
+            elif(lineArgs[1] in Btype):
+                #symb: b al LABEL or Number
+                #symb: bal al Label or Number
+                if(lineArgs[3] in symbolTable):
+                    jumper = symbolTable[lineArgs[3]]
+                    jumper = jumper - count -1
+                    outLine = '{0:023b}'.format(jumper)
+                    outLine += Cond[lineArgs[2]] + Btype[lineArgs[1]]
+                else:
+                    outLine = '{0:023b}'.format(int(lineArgs[3]))
+                    outLine += Cond[lineArgs[2]] + Btype[lineArgs[1]]
+
             else: # If not any of these, make it a no op
                 outLine = '0' * 32
             
         else:
-            #npote conditionals will be the last thing on the assembler to be read
+            #note conditionals will be the last thing on the assembler to be read
             # ex: add al r3,r0,r2  for the ease of reading
             # for the normal execution have two spaces twixt the instruction and the registers
             #ex: add  r3,r0,r2 for a normal command (always)            
@@ -138,6 +150,7 @@ def pass2(fileName, symbolTable):
                     outLine = reg[lineArgs[2]] + '00000'+'00000' + opx[lineArgs[0]] + '0' 
                     
                 else:
+                    #ex: add al r3,r0,r2 for a normal command (always)
                     outLine = reg[lineArgs[3]] + reg[lineArgs[4]] + reg[lineArgs[2]] + opx[lineArgs[0]]
                     if(lineArgs[0] == 'cmp'): #Sets the s bit
                         outLine += '1'
@@ -150,8 +163,8 @@ def pass2(fileName, symbolTable):
                 #lw al r3,0(r4)
                 
                 if(lineArgs[0] == 'lw' or lineArgs[0] == 'sw'  ):
-                    process = re.split('[(]',lineArgs[3][:len(lineArgs[3]-1)])
-                    outLine = reg[process[1]] + reg(lineArgs[2]) + '{0:012b}'.format(int(process[0]))
+                    process = re.split('[()]',lineArgs[3][:len(lineArgs[3])-1])
+                    outLine = reg[process[1]] + reg[lineArgs[2]] + '{0:012b}'.format(int(process[0]))
                     outLine += '0'
                     outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
                 elif(lineArgs[0] == 'addi'):
@@ -160,23 +173,31 @@ def pass2(fileName, symbolTable):
                     outLine += '0'
                     outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
     
-                # Are we even doing SI?
+                
             elif(lineArgs[0] in Btype):
                 #b al LABEL or Number
                 #bal al Label or Number
                 if(lineArgs[2] in symbolTable):
                     jumper = symbolTable[lineArgs[2]]
-                    outLine = '{0:023b}'.format()
+                    jumper = jumper - count -1
+                    outLine = '{0:023b}'.format(jumper)
+                    outLine += Cond[lineArgs[1]] + Btype[lineArgs[0]]
+                else:
+                    outLine = '{0:023b}'.format(int(lineArgs[2]))
+                    outLine += Cond[lineArgs[1]] + Btype[lineArgs[0]]
             #elif(lineArgs[0] in Jtype): TODO J types
             else: # If the command is blank or not recognized then introduce a NO OP
                 outLine = '0' * 32
         print(outLine)
-        print(str(hex(int(outLine,2))))
         outPrinter = str(hex(int(outLine,2)))[2:]
         if(len(outPrinter) <8):
-            outPrinter = '0'*(8-len(outPrinter)) + outPrinter   
+            outPrinter = '0'*(8-len(outPrinter)) + outPrinter
+        print(outPrinter)
         outFile.write(outPrinter+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
     print(fileName +' is done assembling\n')
+    myfile.close()
+    outFile.close()
+    
         
     
     
@@ -185,6 +206,6 @@ def pass2(fileName, symbolTable):
 #TODO call that will asseble the whole file
 def assemble(fileName):
     pass2(fileName,pass1(fileName)) # assemble that file!
-    return 0 # ends the function
+    return # ends the function
 
     
