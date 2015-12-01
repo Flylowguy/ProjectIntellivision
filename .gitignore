@@ -8,3 +8,8 @@ desktop.ini
 *.jdi
 *.pof
 *.sof
+simulation/
+db/
+incremental_db/
+*.qpf
+*.qsf
