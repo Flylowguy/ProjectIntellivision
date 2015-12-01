@@ -34,7 +34,8 @@ global Btype = {'b' = '01011',
 global Jtype = {'j' = '01101',
                 'jal' = '01110',
                 'li' = '01111'}
-global Cond = {'al' ='0000',
+global Cond = { '' = '0000',
+                'al' ='0000',
                 'nv' ='0001',
                 'eq' ='0010',
                 'ne' ='0011',
@@ -96,24 +97,70 @@ def pass2(fileName, symbolTable):
         count++
         lineArgs = re.split('[ ,]',line);
         if(lineArgs[0] in symbolTable):
+            if(lineArgs[1] in Rtype):
+                
+                outLine = reg[lineArgs[4]] + reg[lineArgs[5]] + reg[lineArgs[3]] + opx[lineArgs[1]]
+                if(lineArgs[1] = 'cmp'): #Sets the s bit
+                    outLine += '1'
+                else:
+                    outLine += '0'
+
+                outLine += Cond[lineArgs[2]] + Rtype[lineArgs[1]]
+            elif(lineArgs[1] in Dtype):
+                #for lw and sw there MUST be a 0 in front
+                #label lw al r3,0(r4)
+                
+                if(Dtype[lineArgs[1]] == 'lw' or Dtype[lineArgs[1]] == 'sw'  ):
+                    process = re.split('[(]',lineArgs[4][:len(lineArgs[4]-1)])
+                    outLine = reg[process[1]] + reg(lineArgs[3]) + '{0:012b}'.format(process[0])
+                    outLine += '0'
+                    outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
+                elif(Dtype[lineArgs[1]] == 'addi'):
+                    #label addi al r3,r2,100
+                    outLine = reg[lineArgs[4]] + reg[lineArgs[3]] + '{0:012b}'.format(lineArgs[5])
+                    outLine += '0'
+                    outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
+    
+                # Are we even doing SI?
+            else:
+                outLine = '0' * 32
             
         else:
             #npote conditionals will be the last thing on the assembler to be read
-            # ex: add r3,r0,r2 al for the ease of reading
+            # ex: add al r3,r0,r2  for the ease of reading
+            # for the normal execution have two spaces twixt the instruction and the registers
+            #ex: add  r3,r0,r2 for a normal command (always)            
             if(lineArgs[0] in Rtype):
                 
-                outLine = reg[lineArgs[2]] + reg[lineArgs[3]] + reg[lineArgs[1]] + opx[lineArgs[0]]
+                outLine = reg[lineArgs[3]] + reg[lineArgs[4]] + reg[lineArgs[2]] + opx[lineArgs[0]]
                 if(lineArgs[0] = 'cmp'): #Sets the s bit
                     outLine += '1'
                 else:
                     outLine += '0'
 
-                outLine += Cond[lineArgs[4]] + Rtype[lineArgs[0]]
+                outLine += Cond[lineArgs[1]] + Rtype[lineArgs[0]]
             elif(lineArgs[0] in Dtype):
+                #for lw and sw there MUST be a 0 in front
+                #lw al r3,0(r4)
+                
+                if(Dtype[lineArgs[0]] == 'lw' or Dtype[lineArgs[0]] == 'sw'  ):
+                    process = re.split('[(]',lineArgs[3][:len(lineArgs[3]-1)])
+                    outLine = reg[process[1]] + reg(lineArgs[2]) + '{0:012b}'.format(process[0])
+                    outLine += '0'
+                    outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
+                elif(Dtype[lineArgs[0]] == 'addi'):
+                    #addi al r3,r2,100
+                    outLine = reg[lineArgs[3]] + reg[lineArgs[2]] + '{0:012b}'.format(lineArgs[4])
+                    outLine += '0'
+                    outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
+    
+                # Are we even doing SI?
             elif(lineArgs[0] in Btype):
-            else(lineArgs[0] in Jtype):
+            elif(lineArgs[0] in Jtype):
+            else:
+                outLine = '0' * 32
 
-            outfile.write(str(hex(int(outLine,2)))[2:]+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
+        outfile.write(str(hex(int(outLine,2)))[2:]+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
         
         
     
