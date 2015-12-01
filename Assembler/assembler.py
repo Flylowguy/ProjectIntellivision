@@ -5,8 +5,7 @@
 # python assembler.py fileName.s
 #NOTE: Since Python Syntax is indent based It is reccommended that ANY editing be done using IDLE 
 #the built in python editor. This assembler is being written in Python 3.4
- 
-# TODO, will be able to add source files as well (IE other files like for stacking)
+
 import sys
 import re
 #These are file wide constants/global identifiers
@@ -22,7 +21,10 @@ global opx = {'add' = '0000000',
               'sub' = '0000001',
               'and' = '0000011',
               'or' = '0000010',
-              'xor' = '0000100'}
+              'xor' = '0000100',
+              'sll' = '0000000',
+                'cmp' = '0000000',
+                'jr' = '0000000'}
 global Dtype = {'lw' = '00111',
                 'sw' = '01001',
                 'addi' = '01000',
@@ -32,11 +34,29 @@ global Btype = {'b' = '01011',
 global Jtype = {'j' = '01101',
                 'jal' = '01110',
                 'li' = '01111'}
+global Cond = {'al' ='0000',
+                'nv' ='0001',
+                'eq' ='0010',
+                'ne' ='0011',
+                'vs' ='0100',
+                'vc' ='0101',
+                'mi' ='0110',
+                'pl' ='0111',
+                'cs' ='1000',
+                'cc' ='1001',
+                'hi' ='1010',
+                'ls' ='1011',
+                'gt' ='1100',
+                'lt' ='1101',
+                'ge' ='1110',
+                'le' ='1111'
+                }
 global reg = {}
 temp = ''
 for i in range(0,31): # this loop creates a list of all the registers (for identification)
     temp = 'r' + str(i)
     reg[temp] = '{0:05b}'.format(i)
+    temp = ''
 global knownSymbols = [Rtype,Dtype,Btype,Jtype]#list containing all known/predefined symbols
 
 
@@ -65,12 +85,37 @@ def pass1(fileName):
 # TODO helper method for second pass
 # takes in symbol table of pass1 and uses it to create the .o file
 # IE Fully assembles it.
-def pass2(fileName, sybolTable): 
-    myfile  = open(fileName, "r")
+def pass2(fileName, symbolTable): 
+    myfile  = open(fileName, 'r')
     nl = len(fileName)
-    outName = fileName[:nl-1]+".o" #creates new file for write out.
-    outfile = open(outName,"w")
-    #todo process the information and create the binary instructions to the out file.
+    outName = fileName[:nl-1]+'.o' #creates new file for write out.
+    outfile = open(outName,'w')
+    count = 0
+    outLine = ""
+    for line in myfile:
+        count++
+        lineArgs = re.split('[ ,]',line);
+        if(lineArgs[0] in symbolTable):
+            
+        else:
+            #npote conditionals will be the last thing on the assembler to be read
+            # ex: add r3,r0,r2 al for the ease of reading
+            if(lineArgs[0] in Rtype):
+                
+                outLine = reg[lineArgs[2]] + reg[lineArgs[3]] + reg[lineArgs[1]] + opx[lineArgs[0]]
+                if(lineArgs[0] = 'cmp'): #Sets the s bit
+                    outLine += '1'
+                else:
+                    outLine += '0'
+
+                outLine += Cond[lineArgs[4]] + Rtype[lineArgs[0]]
+            elif(lineArgs[0] in Dtype):
+            elif(lineArgs[0] in Btype):
+            else(lineArgs[0] in Jtype):
+
+            outfile.write(str(hex(int(outLine,2)))[2:]+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
+        
+        
     
     
 
