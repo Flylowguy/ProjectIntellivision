@@ -89,8 +89,8 @@ def pass1(fileName):
 def pass2(fileName, symbolTable): 
     myfile  = open(fileName, 'r')
     nl = len(fileName)
-    outName = fileName[:nl-1]+'.o' #creates new file for write out.
-    outfile = open(outName,'w')
+    outName = fileName[:nl-2]+'.o' #creates new file for write out.
+    outFile = open(outName,'w')
     count = 0
     outLine = ""
     for line in myfile:
@@ -112,14 +112,14 @@ def pass2(fileName, symbolTable):
                 #for lw and sw there MUST be a 0 in front
                 #label lw al r3,0(r4)
                 
-                if(Dtype[lineArgs[1]] == 'lw' or Dtype[lineArgs[1]] == 'sw'  ):
+                if(lineArgs[1] == 'lw' or lineArgs[1] == 'sw'  ):
                     process = re.split('[(]',lineArgs[4][:len(lineArgs[4]-1)])
-                    outLine = reg[process[1]] + reg(lineArgs[3]) + '{0:012b}'.format(process[0])
+                    outLine = reg[process[1]] + reg(lineArgs[3]) + '{0:012b}'.format(int(process[0]))
                     outLine += '0'
                     outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
-                elif(Dtype[lineArgs[1]] == 'addi'):
+                elif(lineArgs[1] == 'addi'):
                     #label addi al r3,r2,100
-                    outLine = reg[lineArgs[4]] + reg[lineArgs[3]] + '{0:012b}'.format(lineArgs[5])
+                    outLine = reg[lineArgs[4]] + reg[lineArgs[3]] + '{0:012b}'.format(int(lineArgs[5]))
                     outLine += '0'
                     outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
     
@@ -149,14 +149,14 @@ def pass2(fileName, symbolTable):
                 #for lw and sw there MUST be a 0 in front
                 #lw al r3,0(r4)
                 
-                if(Dtype[lineArgs[0]] == 'lw' or Dtype[lineArgs[0]] == 'sw'  ):
+                if(lineArgs[0] == 'lw' or lineArgs[0] == 'sw'  ):
                     process = re.split('[(]',lineArgs[3][:len(lineArgs[3]-1)])
-                    outLine = reg[process[1]] + reg(lineArgs[2]) + '{0:012b}'.format(process[0])
+                    outLine = reg[process[1]] + reg(lineArgs[2]) + '{0:012b}'.format(int(process[0]))
                     outLine += '0'
                     outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
-                elif(Dtype[lineArgs[0]] == 'addi'):
+                elif(lineArgs[0] == 'addi'):
                     #addi al r3,r2,100
-                    outLine = reg[lineArgs[3]] + reg[lineArgs[2]] + '{0:012b}'.format(lineArgs[4])
+                    outLine = reg[lineArgs[3]] + reg[lineArgs[2]] + '{0:012b}'.format(int(lineArgs[4]))
                     outLine += '0'
                     outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
     
@@ -165,26 +165,26 @@ def pass2(fileName, symbolTable):
                 #b al LABEL or Number
                 #bal al Label or Number
                 if(lineArgs[2] in symbolTable):
-                    outLine = '{0:023b}'.format(symbolTable[lineArgs[2]])
+                    jumper = symbolTable[lineArgs[2]]
+                    outLine = '{0:023b}'.format()
             #elif(lineArgs[0] in Jtype): TODO J types
             else: # If the command is blank or not recognized then introduce a NO OP
                 outLine = '0' * 32
-
-        outfile.write(str(hex(int(outLine,2)))[2:]+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
-        
+        print(outLine)
+        print(str(hex(int(outLine,2))))
+        outPrinter = str(hex(int(outLine,2)))[2:]
+        if(len(outPrinter) <8):
+            outPrinter = '0'*(8-len(outPrinter)) + outPrinter   
+        outFile.write(outPrinter+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
+    print(fileName +' is done assembling\n')
         
     
     
 
 
 #TODO call that will asseble the whole file
-def assemble():
-    for i in range(1,len(sys.argv)-1):# for each given file
-        pass2(sys.argv[i], pass1(sys.argv[i])) # assemble that file!
+def assemble(fileName):
+    pass2(fileName,pass1(fileName)) # assemble that file!
     return 0 # ends the function
 
-#Main function
-def main():
-    assemble() # assembles all given files given the params below
-    return 0 # ends the main
     
