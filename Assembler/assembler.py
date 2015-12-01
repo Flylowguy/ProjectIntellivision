@@ -98,13 +98,15 @@ def pass2(fileName, symbolTable):
         lineArgs = re.split('[ ,]',line);
         if(lineArgs[0] in symbolTable):
             if(lineArgs[1] in Rtype):
-                
-                outLine = reg[lineArgs[4]] + reg[lineArgs[5]] + reg[lineArgs[3]] + opx[lineArgs[1]]
-                if(lineArgs[1] = 'cmp'): #Sets the s bit
-                    outLine += '1'
+                if(lineArgs[1] == 'jr'):
+                    #jr al r30
+                    outLine = reg[lineArgs[3]] + '00000'+'00000' + opx[lineArgs[1]] + '0'
                 else:
-                    outLine += '0'
-
+                    outLine = reg[lineArgs[4]] + reg[lineArgs[5]] + reg[lineArgs[3]] + opx[lineArgs[1]]
+                    if(lineArgs[1] = 'cmp'): #Sets the s bit
+                        outLine += '1'
+                    else:
+                        outLine += '0'
                 outLine += Cond[lineArgs[2]] + Rtype[lineArgs[1]]
             elif(lineArgs[1] in Dtype):
                 #for lw and sw there MUST be a 0 in front
@@ -122,7 +124,7 @@ def pass2(fileName, symbolTable):
                     outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
     
                 # Are we even doing SI?
-            else:
+            else: # If not any of these, make it a no op
                 outLine = '0' * 32
             
         else:
@@ -131,12 +133,16 @@ def pass2(fileName, symbolTable):
             # for the normal execution have two spaces twixt the instruction and the registers
             #ex: add  r3,r0,r2 for a normal command (always)            
             if(lineArgs[0] in Rtype):
-                
-                outLine = reg[lineArgs[3]] + reg[lineArgs[4]] + reg[lineArgs[2]] + opx[lineArgs[0]]
-                if(lineArgs[0] = 'cmp'): #Sets the s bit
-                    outLine += '1'
+                if(lineArgs[0] == 'jr'):
+                    #jr al r30
+                    outLine = reg[lineArgs[2]] + '00000'+'00000' + opx[lineArgs[0]] + '0' 
+                    
                 else:
-                    outLine += '0'
+                    outLine = reg[lineArgs[3]] + reg[lineArgs[4]] + reg[lineArgs[2]] + opx[lineArgs[0]]
+                    if(lineArgs[0] = 'cmp'): #Sets the s bit
+                        outLine += '1'
+                    else:
+                        outLine += '0'
 
                 outLine += Cond[lineArgs[1]] + Rtype[lineArgs[0]]
             elif(lineArgs[0] in Dtype):
@@ -157,7 +163,7 @@ def pass2(fileName, symbolTable):
                 # Are we even doing SI?
             elif(lineArgs[0] in Btype):
             elif(lineArgs[0] in Jtype):
-            else:
+            else: # If the command is blank or not recognized then introduce a NO OP
                 outLine = '0' * 32
 
         outfile.write(str(hex(int(outLine,2)))[2:]+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
