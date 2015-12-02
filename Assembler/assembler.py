@@ -102,6 +102,13 @@ def pass2(fileName, symbolTable):
                 if(lineArgs[1] == 'jr'):
                     #jr al r30
                     outLine = reg[lineArgs[3]] + '00000'+'00000' + opx[lineArgs[1]] + '0'
+                elif(lineArgs[0] == 'cmp'):
+                    #cmp al r3,r4
+                    outLine = reg[lineArgs[3]] + reg[lineArgs[4]] + reg['r0'] + opx[lineArgs[1]]
+                    if(lineArgs[1] == 'cmp'): #Sets the s bit
+                        outLine += '1'
+                    else:
+                        outLine += '0'
                 else:
                     outLine = reg[lineArgs[4]] + reg[lineArgs[5]] + reg[lineArgs[3]] + opx[lineArgs[1]]
                     if(lineArgs[1] == 'cmp'): #Sets the s bit
@@ -147,7 +154,14 @@ def pass2(fileName, symbolTable):
             if(lineArgs[0] in Rtype):
                 if(lineArgs[0] == 'jr'):
                     #jr al r30
-                    outLine = reg[lineArgs[2]] + '00000'+'00000' + opx[lineArgs[0]] + '0' 
+                    outLine = reg[lineArgs[2]] + '00000'+'00000' + opx[lineArgs[0]] + '0'
+                elif(lineArgs[0] == 'cmp'):
+                    #cmp al r3,r4
+                    outLine = reg[lineArgs[2]] + reg[lineArgs[3]] + reg['r0'] + opx[lineArgs[0]]
+                    if(lineArgs[0] == 'cmp'): #Sets the s bit
+                        outLine += '1'
+                    else:
+                        outLine += '0'
                     
                 else:
                     #ex: add al r3,r0,r2 for a normal command (always)
@@ -207,8 +221,4 @@ def pass2(fileName, symbolTable):
 def assemble(fileName):
     pass2(fileName,pass1(fileName)) # assemble that file!
     return # ends the function
-def main():
-    assemble(sys.argv[1])
-    return
 
-    
