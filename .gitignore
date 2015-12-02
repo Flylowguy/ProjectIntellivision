@@ -13,3 +13,4 @@ db/
 incremental_db/
 *.qpf
 *.qsf
+__pycache__/
