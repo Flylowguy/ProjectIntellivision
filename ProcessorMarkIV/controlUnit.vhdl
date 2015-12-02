@@ -53,7 +53,8 @@ ARCHITECTURE behavior OF controlUnit IS
         ELSIF(stage = 3) THEN
           IF(S = '1') THEN
             ps_enable <= '1';
-          ELSIF(opCode = "00000" or opCode = "00100" or opCode = "00101" or opCode = "00110") THEN
+          END IF;
+          IF(opCode = "00000" or opCode = "00100" or opCode = "00101" or opCode = "00110") THEN
           --D-Type instructions:
             IF(opCode(2) = '1' and opCode(1) = '1' and opCode(0) = '0') THEN
               --jr
@@ -61,8 +62,8 @@ ARCHITECTURE behavior OF controlUnit IS
               pc_enable <= '1';
             ELSIF(opcode(2) = '1' and opCode(1) = '0' and opCode(0) = '1') THEN
               --cmp
-              alu_op <= "00";
               b_inv <= '1';
+              alu_op <= "00";
               ps_enable <= '1';
             ELSIF(opCode(2) = '1' and opCode(1) = '0' and opCode(0) = '0') THEN
               --sll
