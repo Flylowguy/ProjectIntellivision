@@ -122,12 +122,12 @@ def pass2(fileName, symbolTable):
                 
                 if(lineArgs[1] == 'lw' or lineArgs[1] == 'sw'  ):
                     process = re.split('[()]',lineArgs[4][:len(lineArgs[4])-1])
-                    outLine = reg[process[1]] + reg[lineArgs[3]] + '{0:012b}'.format(int(process[0]))
+                    outLine = reg[process[1]] + reg[lineArgs[3]] + binaryChange(int(process[0]),12)
                     outLine += '0'
                     outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
                 elif(lineArgs[1] == 'addi'):
                     #label addi al r3,r2,100
-                    outLine = reg[lineArgs[4]] + reg[lineArgs[3]] + '{0:012b}'.format(int(lineArgs[5]))
+                    outLine = reg[lineArgs[4]] + reg[lineArgs[3]] + binaryChange(int(lineArgs[5]),12)
                     outLine += '0'
                     outLine += Cond[lineArgs[2]] + Dtype[lineArgs[1]]
     
@@ -137,10 +137,10 @@ def pass2(fileName, symbolTable):
                 if(lineArgs[3] in symbolTable):
                     jumper = symbolTable[lineArgs[3]]
                     jumper = jumper - count -1
-                    outLine = '{0:023b}'.format(jumper)
+                    outLine = binaryChange(jumper,23)
                     outLine += Cond[lineArgs[2]] + Btype[lineArgs[1]]
                 else:
-                    outLine = '{0:023b}'.format(int(lineArgs[3]))
+                    outLine = binaryChange(int(lineArgs[3]),23)
                     outLine += Cond[lineArgs[2]] + Btype[lineArgs[1]]
 
             else: # If not any of these, make it a no op
@@ -178,12 +178,12 @@ def pass2(fileName, symbolTable):
                 
                 if(lineArgs[0] == 'lw' or lineArgs[0] == 'sw'  ):
                     process = re.split('[()]',lineArgs[3][:len(lineArgs[3])-1])
-                    outLine = reg[process[1]] + reg[lineArgs[2]] + '{0:012b}'.format(int(process[0]))
+                    outLine = reg[process[1]] + reg[lineArgs[2]] + binaryChange(int(process[0]),12)
                     outLine += '0'
                     outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
                 elif(lineArgs[0] == 'addi'):
                     #addi al r3,r2,100
-                    outLine = reg[lineArgs[3]] + reg[lineArgs[2]] + '{0:012b}'.format(int(lineArgs[4]))
+                    outLine = reg[lineArgs[3]] + reg[lineArgs[2]] + binaryChange(int(lineArgs[4]),12)
                     outLine += '0'
                     outLine += Cond[lineArgs[1]] + Dtype[lineArgs[0]]
     
@@ -194,10 +194,10 @@ def pass2(fileName, symbolTable):
                 if(lineArgs[2] in symbolTable):
                     jumper = symbolTable[lineArgs[2]]
                     jumper = jumper - count -1
-                    outLine = '{0:023b}'.format(jumper)
+                    outLine = binaryChange(jumper,23)
                     outLine += Cond[lineArgs[1]] + Btype[lineArgs[0]]
                 else:
-                    outLine = '{0:023b}'.format(int(lineArgs[2]))
+                    outLine = binaryChange(lineArgs[2],23)
                     outLine += Cond[lineArgs[1]] + Btype[lineArgs[0]]
             #elif(lineArgs[0] in Jtype): TODO J types
             else: # If the command is blank or not recognized then introduce a NO OP
@@ -213,7 +213,29 @@ def pass2(fileName, symbolTable):
     outFile.close()
 
     
-
+def binaryChange(number,leng):
+    ret = ''
+    nuStr = ''
+    if(number >=0):
+        nuStr = '{0:0'+str(leng)+'b}'
+        ret = nuStr.format(number)
+        return ret
+    else:
+        number = -1*number
+        nuStr = str(bin(number))
+        nuStr = nuStr[2:]
+        nuStr = '0' *(leng-len(nuStr)) + nuStr
+        negStr = ''
+        for i in nuStr:
+            if(i == '0'):
+                negStr += '1'
+            else:
+                negStr += '0'
+        negStr = bin(int(negStr,2)+1)
+        return str(negStr)[2:]
+    
+        
+        
     
 #TODO call that will asseble the whole file
 def assemble(fileName):
