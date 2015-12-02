@@ -23,4 +23,4 @@ force clock 0 0, 1 50 -repeat 100
 force reset 0 0
 
 
-run 5000
+run 10000
