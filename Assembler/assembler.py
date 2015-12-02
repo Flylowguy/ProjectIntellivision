@@ -77,7 +77,7 @@ def pass1(fileName):
         #other insturctions. Only where labels begin.
         inSet = False
         for L in knownSymbols: #goes through each dict of Known symbols
-            if(lineArgs[0] in L):# if item in dict
+            if(lineArgs[0] in L or lineArgs[0] == 'nop'):# if item in dict
                 inSet = True
         if( not inSet):
             symbolTable[lineArgs[0]] = count 
@@ -142,6 +142,17 @@ def pass2(fileName, symbolTable):
                 else:
                     outLine = binaryChange(int(lineArgs[3]),23)
                     outLine += Cond[lineArgs[2]] + Btype[lineArgs[1]]
+            elif(lineArgs[1] in Jtype):
+                if(lineArgs[2] in symbolTable):
+                    jumper = symbolTable[lineArgs[2]]
+                    jumper = jumper - count -1
+                    outLine = binaryChange(jumper,27)
+                    outLine += Jtype[lineArgs[1]]
+                else:
+                    outLine = binaryChange(lineArgs[2],27)
+                    outLine += Jtype[lineArgs[1]]
+            elif(lineArgs[1] == 'nop'):
+                outLine = '0' * 32
 
             else: # If not any of these, make it a no op
                 outLine = '0' * 32
@@ -199,7 +210,17 @@ def pass2(fileName, symbolTable):
                 else:
                     outLine = binaryChange(lineArgs[2],23)
                     outLine += Cond[lineArgs[1]] + Btype[lineArgs[0]]
-            #elif(lineArgs[0] in Jtype): TODO J types
+            elif(lineArgs[0] in Jtype):
+                if(lineArgs[1] in symbolTable):
+                    jumper = symbolTable[lineArgs[1]]
+                    jumper = jumper - count -1
+                    outLine = binaryChange(jumper,27)
+                    outLine += Jtype[lineArgs[0]]
+                else:
+                    outLine = binaryChange(lineArgs[1],27)
+                    outLine += Jtype[lineArgs[0]]
+            elif(lineArgs[0] == 'nop'):
+                outLine = '0' * 32
             else: # If the command is blank or not recognized then introduce a NO OP
                 outLine = '0' * 32
         print(outLine)
@@ -214,6 +235,7 @@ def pass2(fileName, symbolTable):
 
     
 def binaryChange(number,leng):
+    number = int(number)
     ret = ''
     nuStr = ''
     if(number >=0):
