@@ -212,11 +212,6 @@ def pass2(fileName, symbolTable):
     myfile.close()
     outFile.close()
     
-        
-    
-    
-
-
 #TODO call that will asseble the whole file
 def assemble(fileName):
     pass2(fileName,pass1(fileName)) # assemble that file!
