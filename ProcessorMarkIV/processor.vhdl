@@ -176,7 +176,7 @@ BEGIN
 
   ir: IR32 PORT MAP(memoryOut, ir_enable, reset, (clock), instruction);
 
-  control: controlUnit PORT MAP(instruction(4 DOWNTO 0), "0000", instruction(16 DOWNTO 10), instruction(9), psOut(2), psOut(3), psOut(1), psOut(0), '1', clock, reset, aluOP, c_select, y_select, extend, rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, dumbSelect,ps_enable);
+  control: controlUnit PORT MAP(instruction(4 DOWNTO 0), instruction(8 downto 5), instruction(16 DOWNTO 10), instruction(9), psOut(2), psOut(3), psOut(1), psOut(0), '1', clock, reset, aluOP, c_select, y_select, extend, rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, dumbSelect,ps_enable);
 
   dumbMux: mux2 PORT MAP(RYOutput, muxMemOut, dumbSelect, regDataIn);
 
