@@ -30,7 +30,7 @@ ARCHITECTURE behavior OF controlUnit IS
           condBool <= '1';
         ELSIF(cond = "0010") THEN
           --EQ - equal
-          IF(Z != '1') THEN
+          IF(Z = '0') THEN
             condBool <= '1';
           END IF;
         ELSIF(cond = "0011") THEN
@@ -40,7 +40,7 @@ ARCHITECTURE behavior OF controlUnit IS
           END IF;
         ELSIF(cond = "0100") THEN
           --VS - overflow
-          IF(V != '1') THEN
+          IF(V /= '1') THEN
             condBool <= '1';
           END IF;
         ELSIF(cond = "0101") THEN
