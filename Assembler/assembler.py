@@ -208,7 +208,7 @@ def assemble(fileName):
     pass2(fileName,pass1(fileName)) # assemble that file!
     return # ends the function
 def main():
-    assemble(sys.argv[1])
+    assemble('test.s')
     return
 
     

@@ -30,6 +30,13 @@ COMPONENT ALU
 		fOut    :OUT  STD_LOGIC_VECTOR(31 DOWNTO 0)
 	);
 END COMPONENT;
+COMPONENT Reg4
+	PORT(
+		data									:IN std_logic_vector(3 downto 0);
+		enable, reset, Clock				:IN std_logic;
+		output								:OUT std_logic_vector(3 downto 0)
+	);
+END COMPONENT;
 COMPONENT BuffReg4
 	PORT(
 		data									:IN std_logic_vector(3 downto 0);
@@ -177,7 +184,7 @@ BEGIN
 
   muxMaSelect: mux2 PORT MAP(RZOutput, pcOut, ma_select, muxMaSelectOut);
 
-  ps: BuffReg4 PORT MAP(c & n & v & z, ps_enable, clock, psOut);
+  ps: reg4 PORT MAP(c & n & v & z, ps_enable, reset, clock, psOut);
 
   RM: BuffReg32 PORT MAP(RBOutput, reset, clock, rmOut);
 
