@@ -224,11 +224,12 @@ def pass2(fileName, symbolTable):
             else: # If the command is blank or not recognized then introduce a NO OP
                 outLine = '0' * 32
         print(outLine)
+        outFile.write(outLine)
         outPrinter = str(hex(int(outLine,2)))[2:]
         if(len(outPrinter) <8):
             outPrinter = '0'*(8-len(outPrinter)) + outPrinter
         print(outPrinter)
-        outFile.write(outPrinter+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
+        outFile.write('      '+outPrinter+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
     print(fileName +' is done assembling\n')
     myfile.close()
     outFile.close()
