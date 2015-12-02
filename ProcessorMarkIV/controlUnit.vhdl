@@ -14,11 +14,92 @@ ENTITY controlUnit IS
 END controlUnit;
 
 ARCHITECTURE behavior OF controlUnit IS
-    signal wmfc: std_logic;
+    signal wmfc, condBool: std_logic;
     shared variable stage: integer:= 0;
     BEGIN
     PROCESS(clock, reset)
     BEGIN
+      IF(falling_edge(clock)) THEN
+        --test conditionals
+        condBool <= '0';
+        IF(cond = "0000") THEN
+          --AL - always
+          condBool <= '0';
+        ELSIF(cond = "0001") THEN
+          --NV - never
+          condBool <= '1';
+        ELSIF(cond = "0010") THEN
+          --EQ - equal
+          IF(Z != '1') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "0011") THEN
+          --NE - not equal
+          IF(Z = '1') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "0100") THEN
+          --VS - overflow
+          IF(V != '1') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "0101") THEN
+          --VC - no overflow
+          IF(V = '1') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "0110") THEN
+          --MI - negative
+          IF(N = '0') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "0111") THEN
+          --PL - Positive or Zero
+          IF(N = '1') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1000") THEN
+          --CS - unsigned higher or same
+          IF(C = '0') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1001") THEN
+          --CC - unsigned lower
+          IF(C = '1') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1010") THEN
+          --HI - UNSIGNED higher
+          IF(C = '0' and Z = '1') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1011") THEN
+          --LS - unsigned lower or same
+          IF(C = '1' OR Z = '0') THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1100") THEN
+          --gt - greater than
+          IF(Z = '1' AND ((N = '0' AND V = '0') OR (N = '1' AND V = '1'))) THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1101") THEN
+          --lt - less than
+          IF((N = '0' AND V = '1') OR (Z = '1' AND V = '0')) THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1110") THEN
+          --ge - Greater than or equal
+          IF((N = '0' AND V = '0') OR (N = '1' AND V = '1')) THEN
+            condBool <= '1';
+          END IF;
+        ELSIF(cond = "1111") THEN
+          --le - less than or equal
+          IF(Z = '0' OR ((N = '0' AND V = '1') OR (Z = '1' AND V = '1'))) THEN
+            condBool <= '1';
+          END IF;
+        END IF;
+      END IF;
       IF(rising_edge(clock)) THEN
         IF(reset = '1') THEN
           stage := 0;
@@ -50,7 +131,7 @@ ARCHITECTURE behavior OF controlUnit IS
           ir_enable <= '0';
           mem_read <= '0';
           pc_enable <= '0';
-        ELSIF(stage = 3) THEN
+        ELSIF(stage = 3 and condBool = '0') THEN
           IF(S = '1') THEN
             ps_enable <= '1';
           END IF;
@@ -114,7 +195,7 @@ ARCHITECTURE behavior OF controlUnit IS
           --J-Type instructions:
 
           END IF;
-        ELSIF(stage = 4) THEN
+        ELSIF(stage = 4 and condBool = '0') THEN
           ps_enable <= '0';
           IF(opCode = "00111") THEN
           --lw
@@ -138,7 +219,7 @@ ARCHITECTURE behavior OF controlUnit IS
           pc_enable <= '1';
           pc_select <= '0';
           END IF;
-        ELSIF(stage = 5) THEN
+        ELSIF(stage = 5  and condBool = '0') THEN
 				ma_select <= '1';
           IF(opCode = "00000") THEN
           --R-Type
