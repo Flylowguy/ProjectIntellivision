@@ -81,7 +81,7 @@ COMPONENT controlUnit
     opx                                 :IN std_logic_vector(6 DOWNTO 0);
     S, N, C, V, Z, mfc, clock, reset    :IN std_logic;
     alu_op, c_select, y_select, extend  :OUT std_logic_vector(1 DOWNTO 0);
-    rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select,dumbSel :OUT std_logic
+    rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select,dumbSel,ps_enable :OUT std_logic
   );
 END COMPONENT;
 COMPONENT mux3
@@ -134,17 +134,17 @@ SIGNAL MuxCOutput :std_logic_vector(4 DOWNTO 0);
 SIGNAL RZOutput, RAOutput, RBOutput, MuxBOutput, dataS, dataT, ZEROS, aluOut, MuxYOutput, RYOutput, instruction, immediate1s, immediate2s, muxIncOut, pcAdderOut, pcOut, pcIn, muxMaSelectOut, rmOut, memoryOut,pcTempOut :std_logic_vector(31 downto 0);
 SIGNAL psOut :std_logic_vector(3 downto 0);
 SIGNAL regDataIN : STD_LOGIC_VECTOR(31 downto 0);
-SIGNAL dumbSelect : STD_LOGIC;
+SIGNAL dumbSelect,ps_enable : STD_LOGIC;
 BEGIN
 
   ZEROS <= (OTHERS =>'0');
 
   ir: IR32 PORT MAP(memoryOut, ir_enable, reset, (clock), instruction);
 
-  control: controlUnit PORT MAP(instruction(4 DOWNTO 0), "0000", instruction(16 DOWNTO 10), instruction(9), psOut(2), psOut(3), psOut(1), psOut(0), '1', clock, reset, aluOP, c_select, y_select, extend, rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, dumbSelect);
+  control: controlUnit PORT MAP(instruction(4 DOWNTO 0), "0000", instruction(16 DOWNTO 10), instruction(9), psOut(2), psOut(3), psOut(1), psOut(0), '1', clock, reset, aluOP, c_select, y_select, extend, rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, dumbSelect,ps_enable);
 
   dumbMux: mux2 PORT MAP(RYOutput, memoryOut, dumbSelect, regDataIn);
-  
+
   rf: regFile PORT MAP(reset, rf_write, clock, MuxCOutput, instruction(26 DOWNTO 22), instruction(31 DOWNTO 27), regDataIn, dataS, dataT);
 
   MuxC: mux3by5 PORT MAP("11110", instruction(21 DOWNTO 17), instruction(26 DOWNTO 22), c_select, MuxCOutput);
@@ -177,7 +177,7 @@ BEGIN
 
   muxMaSelect: mux2 PORT MAP(RZOutput, pcOut, ma_select, muxMaSelectOut);
 
-  ps: BuffReg4 PORT MAP(c & n & v & z, instruction(9), clock, psOut);
+  ps: BuffReg4 PORT MAP(c & n & v & z, ps_enable, clock, psOut);
 
   RM: BuffReg32 PORT MAP(RBOutput, reset, clock, rmOut);
 

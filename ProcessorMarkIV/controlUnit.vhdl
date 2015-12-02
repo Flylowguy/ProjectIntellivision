@@ -8,7 +8,7 @@ ENTITY controlUnit IS
     opx :IN std_logic_vector(6 DOWNTO 0);
     S,N,C,V,Z,mfc,clock,reset :IN std_logic;
     alu_op, c_select, y_select, extend :OUT std_logic_vector(1 DOWNTO 0);
-    rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, dumbSel :OUT std_logic
+    rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, dumbSel, ps_enable :OUT std_logic
   );
 
 END controlUnit;
@@ -44,13 +44,16 @@ ARCHITECTURE behavior OF controlUnit IS
           pc_select <= '1';
           pc_enable <= mfc;
           inc_select <= '0';
+          ps_enable <= '0';
         ELSIF(stage = 2) THEN
           wmfc <= '0';
           ir_enable <= '0';
           mem_read <= '0';
           pc_enable <= '0';
         ELSIF(stage = 3) THEN
-          IF(opCode = "00000" or opCode = "00100" or opCode = "00101" or opCode = "00110") THEN
+          IF(S = '1') THEN
+            ps_enable <= '1';
+          ELSIF(opCode = "00000" or opCode = "00100" or opCode = "00101" or opCode = "00110") THEN
           --D-Type instructions:
             IF(opCode(2) = '1' and opCode(1) = '1' and opCode(0) = '0') THEN
               --jr
@@ -60,6 +63,7 @@ ARCHITECTURE behavior OF controlUnit IS
               --cmp
               alu_op <= "00";
               b_inv <= '1';
+              ps_enable <= '1';
             ELSIF(opCode(2) = '1' and opCode(1) = '0' and opCode(0) = '0') THEN
               --sll
             ELSIF(OpCode(2) = '0' and opCode(1) = '0' and opCode(0) = '0') THEN
@@ -110,6 +114,7 @@ ARCHITECTURE behavior OF controlUnit IS
 
           END IF;
         ELSIF(stage = 4) THEN
+          ps_enable <= '0';
           IF(opCode = "00111") THEN
           --lw
           y_select <= "01";
@@ -152,7 +157,7 @@ ARCHITECTURE behavior OF controlUnit IS
           rf_write <= '0';
           mem_write <= '0';
           c_select <= "10";
-			 
+
           ELSIF(opCode = "01100") THEN
           --bal
           rf_write <= '1';
