@@ -29,14 +29,14 @@ COMPONENT ALU
 		Z       :OUT  STD_LOGIC;
 		fOut    :OUT  STD_LOGIC_VECTOR(31 DOWNTO 0)
 	);
-END COMPONENT;
+end COMPONENT;
 COMPONENT BuffReg4
 	PORT(
 		data									:IN std_logic_vector(3 downto 0);
 		reset, Clock						:IN std_logic;
 		output								:OUT std_logic_vector(3 downto 0)
 	);
-END COMPONENT;
+end COMPONENT;
 COMPONENT regFile
   PORT(
     reset, enable, clock  :IN std_logic;
@@ -44,7 +44,7 @@ COMPONENT regFile
     dataD                 :IN std_logic_vector(31 DOWNTO 0);
     dataS, dataT          :OUT std_logic_vector(31 DOWNTO 0)
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT rcAdder
   PORT(
     aIn :IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -53,21 +53,21 @@ COMPONENT rcAdder
     f   :OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
     c30, c31  :OUT STD_LOGIC
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT BuffReg32
   PORT(
     data					:IN std_logic_vector(31 DOWNTO 0);
     reset, Clock  :IN std_logic;
     output				:OUT std_logic_vector(31 DOWNTO 0)
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT IR32
   PORT(
     data									:IN std_logic_vector(31 DOWNTO 0);
     enable, reset, Clock	:IN std_logic;
     output								:OUT std_logic_vector(31 DOWNTO 0)
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT immediate12to32
 	port(immed: in std_logic_vector(11 downto 0);
 		 extend: in std_logic_vector(1 downto 0);
@@ -83,28 +83,28 @@ COMPONENT controlUnit
     alu_op, c_select, y_select, extend  :OUT std_logic_vector(1 DOWNTO 0);
     rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select,dumbSel,ps_enable :OUT std_logic
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT mux3
   PORT(
     d0,d1,d2	:IN std_logic_vector(31 DOWNTO 0);
     sel				:IN std_logic_vector(1 DOWNTO 0);
     f					:OUT std_logic_vector(31 DOWNTO 0)
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT mux3by5
   PORT(
     d0,d1,d2	:IN std_logic_vector(4 DOWNTO 0);
     sel				:IN std_logic_vector(1 DOWNTO 0);
     f					:OUT std_logic_vector(4 DOWNTO 0)
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT mux2
   PORT(
     d0,d1	:IN std_logic_vector(31 DOWNTO 0);
     sel		:IN std_logic;
     f			:OUT std_logic_vector(31 DOWNTO 0)
   );
-END COMPONENT;
+end COMPONENT;
 COMPONENT immediate23to32
 	port(immed: in std_logic_vector(22 downto 0);
 		 extend: in std_logic_vector(1 downto 0);
@@ -119,14 +119,39 @@ PORT
   wren		: IN STD_LOGIC ;
   q		: OUT STD_LOGIC_VECTOR (31 DOWNTO 0)
 );
-END COMPONENT;
+end COMPONENT;
 COMPONENT reg32
 	PORT(
 		data									:IN std_logic_vector(31 downto 0);
 		enable, reset, Clock				:IN std_logic;
 		output								:OUT std_logic_vector(31 downto 0)
 	);
-END COMPONENT;
+end COMPONENT;
+COMPONENT IO_MemoryInterface
+  PORT(
+    clock :  IN  STD_LOGIC;
+    mem_write :  IN  STD_LOGIC;
+    KEY :  IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    mem_addr :  IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
+    mem_data :  IN  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SW :  IN  STD_LOGIC_VECTOR(9 DOWNTO 0);
+    data_out :  OUT  STD_LOGIC_VECTOR(15 DOWNTO 0);
+    HEX0 :  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0);
+    LEDG :  OUT  STD_LOGIC_VECTOR(7 DOWNTO 0)
+  );
+end COMPONENT;
+COMPONENT or1_4
+	PORT(
+			A,B,C,D		:IN std_logic;
+			output	:OUT std_logic
+	);
+end COMPONENT;
+COMPONENT and1_2
+	PORT(
+			A,B		:IN std_logic;
+			output	:OUT std_logic
+	);
+end COMPONENT;
 
 SIGNAL rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, c, n, v, z, c30, c31 :std_logic;
 SIGNAL aluOP, c_select, y_select, extend :std_logic_vector(1 downto 0);
