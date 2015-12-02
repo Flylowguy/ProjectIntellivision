@@ -11,7 +11,7 @@ ENTITY processor IS
   ryOut       :OUT std_logic_vector(31 DOWNTO 0);
   raOut       :OUT std_logic_vector(31 DOWNTO 0);
   rbOut       :OUT std_logic_vector(31 DOWNTO 0);
-  rzOut,muxbout,pcoutput,instructionout,muxMaSelectOutput,rmOutput   :OUT std_logic_vector(31 DOWNTO 0);
+  muxbout,pcoutput,instructionout,muxMaSelectOutput,rmOutput   :OUT std_logic_vector(31 DOWNTO 0);
   mem_writeOut,ma_selectOut,muxBSelectOutput,rfWriteOutput    :OUT std_logic;
   psOutput :OUT std_logic_vector(3 downto 0)
 
@@ -164,7 +164,7 @@ COMPONENT and1_2
 	);
 end COMPONENT;
 
-SIGNAL rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, c, n, v, z, c30, c31, dumbSelect, ps_enable, or1Out, and1Out, and2Out :std_logic;
+SIGNAL rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, c, n, v, z, c30, c31, dumbSelect, ps_enable, or1Out, or2Out, and1Out, and2Out :std_logic;
 SIGNAL aluOP, c_select, y_select, extend :std_logic_vector(1 downto 0);
 SIGNAL psOut :std_logic_vector(3 downto 0);
 SIGNAL MuxCOutput :std_logic_vector(4 DOWNTO 0);
@@ -227,7 +227,7 @@ BEGIN
 
   IO_And2 : and1_2 PORT MAP(and1Out, mem_write, and2Out);
 
-  IO_MemoryInterface: IO_InterfaceOut PORT MAP(clock, and1Out, KEY, muxMaSelectOut(31 DOWNTO 28), rmOut, SW, IO_InterfaceOut, HEX, LEDG);
+  IO_MemoryInterface1: IO_MemoryInterface PORT MAP(clock, and1Out, KEY, muxMaSelectOut(31 DOWNTO 28), rmOut, SW, IO_InterfaceOut, HEX, LEDG);
 
   IO_Or2  : or1_4 PORT MAP(muxMaSelectOut(31), muxMaSelectOut(30), muxMaSelectOut(29), muxMaSelectOut(28), or2Out);
 
@@ -236,7 +236,6 @@ BEGIN
   ryOut <= ryOutput;
   raOut <= RAOutput;
   rbOut <= RBOutput;
-  rzOut <= RZOutput;
   muxBOut <= MuxBOutput;
   pcOutput <= pcOut;
   instructionOut <= instruction;

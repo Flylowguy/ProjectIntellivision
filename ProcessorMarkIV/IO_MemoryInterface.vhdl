@@ -32,10 +32,10 @@ COMPONENT reg32_IO
 end COMPONENT;
 
 COMPONENT mux2
-	PORT(sel : IN STD_LOGIC;
-		 data0x : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-		 data1x : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-		 result : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
+	PORT(
+		d0,d1	:IN std_logic_vector(31 downto 0);
+		sel								:IN std_logic;
+		f									:OUT std_logic_vector(31 downto 0)
 	);
 end COMPONENT;
 
@@ -62,9 +62,9 @@ PORT MAP(clock => SYNTHESIZED_WIRE_0,
 
 b2v_inst : mux2
 PORT MAP(sel => mem_addr(3),
-		 data0x => SYNTHESIZED_WIRE_1,
-		 data1x => SYNTHESIZED_WIRE_2,
-		 result => data_out);
+		 d0 => SYNTHESIZED_WIRE_1,
+		 d1 => SYNTHESIZED_WIRE_2,
+		 f => data_out);
 
 
 SYNTHESIZED_WIRE_8 <= NOT(clock);
