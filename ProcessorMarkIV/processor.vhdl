@@ -7,14 +7,7 @@ ENTITY processor IS
   KEY         :IN std_logic_vector(3 DOWNTO 0);
   SW          :IN std_logic_vector(9 DOWNTO 0);
   LEDG        :OUT std_logic_vector(7 DOWNTO 0);
-  HEX         :OUT std_logic_vector(6 DOWNTO 0);
-  ryOut       :OUT std_logic_vector(31 DOWNTO 0);
-  raOut       :OUT std_logic_vector(31 DOWNTO 0);
-  rbOut       :OUT std_logic_vector(31 DOWNTO 0);
-  muxbout,pcoutput,instructionout,muxMaSelectOutput,rmOutput   :OUT std_logic_vector(31 DOWNTO 0);
-  mem_writeOut,ma_selectOut,muxBSelectOutput,rfWriteOutput    :OUT std_logic;
-  psOutput :OUT std_logic_vector(3 downto 0)
-
+  HEX         :OUT std_logic_vector(6 DOWNTO 0)
 );
 END processor;
 
@@ -178,7 +171,7 @@ BEGIN
 
   control: controlUnit PORT MAP(instruction(4 DOWNTO 0), instruction(8 downto 5), instruction(16 DOWNTO 10), instruction(9), psOut(2), psOut(3), psOut(1), psOut(0), '1', clock, reset, aluOP, c_select, y_select, extend, rf_write, b_select, a_inv, b_inv, ir_enable, ma_select, mem_read, mem_write, pc_select, pc_enable, inc_select, dumbSelect,ps_enable);
 
-  dumbMux: mux2 PORT MAP(RYOutput, muxMemOut, dumbSelect, regDataIn);
+  dumbMux: mux2 PORT MAP(RYOutput, memoryOut, dumbSelect, regDataIn);
 
   rf: regFile PORT MAP(reset, rf_write, clock, MuxCOutput, instruction(26 DOWNTO 22), instruction(31 DOWNTO 27), regDataIn, dataS, dataT);
 
@@ -216,35 +209,39 @@ BEGIN
 
   RM: BuffReg32 PORT MAP(RBOutput, reset, clock, rmOut);
 
-  mainMemory: memory PORT MAP(muxMaSelectOut(9 downto 0), NOT clock, rmOut, and2Out, memoryOut);
+  mainMemory: memory PORT MAP(muxMaSelectOut(9 downto 0), NOT clock, rmOut, (((not muxMaSelectOut(31)) and (not muxMaSelectOut(30)) and (not muxMaSelectOut(29)) and (not muxMaSelectOut(28))) and mem_write), memoryOut);
 
   pcTemp: BuffReg32 PORT MAP(pcOut, reset, clock, pcTempOut);
 
   --I/O Memory Interface Components:
-  IO_Or1  : or1_4 PORT MAP(muxMaSelectOut(31), muxMaSelectOut(30), muxMaSelectOut(29), muxMaSelectOut(28), or1Out);
+  --IO_Or1  : or1_4 PORT MAP(muxMaSelectOut(31), muxMaSelectOut(30), muxMaSelectOut(29), muxMaSelectOut(28), or1Out);
 
-  IO_And1 : and1_2 PORT MAP(or1Out, mem_write, and1Out);
+  --IO_And1 : and1_2 PORT MAP(or1Out, mem_write, and1Out);
 
-  IO_And2 : and1_2 PORT MAP(and1Out, mem_write, and2Out);
+  --IO_And2 : and1_2 PORT MAP(and1Out, mem_write, and2Out);
 
-  IO_MemoryInterface1: IO_MemoryInterface PORT MAP(clock, and1Out, KEY, muxMaSelectOut(31 DOWNTO 28), rmOut, SW, IO_InterfaceOut, HEX, LEDG);
+  IO_MemoryInterface1: IO_MemoryInterface PORT MAP(clock, ((muxMaSelectOut(31) or muxMaSelectOut(30) or muxMaSelectOut(29) or muxMaSelectOut(28)) and mem_write), KEY, muxMaSelectOut(31 DOWNTO 28), rmOut, SW, IO_InterfaceOut, HEX, LEDG);
 
-  IO_Or2  : or1_4 PORT MAP(muxMaSelectOut(31), muxMaSelectOut(30), muxMaSelectOut(29), muxMaSelectOut(28), or2Out);
+  --IO_Or2  : or1_4 PORT MAP(muxMaSelectOut(31), muxMaSelectOut(30), muxMaSelectOut(29), muxMaSelectOut(28), or2Out);
 
-  muxMem : mux2 PORT MAP(memoryOut, IO_InterfaceOut, or2Out, muxMemOut);
+  muxMem : mux2 PORT MAP(memoryOut, IO_InterfaceOut, (not rmOut(31)) and (not rmOut(30)) and (not rmOut(29)) and (not rmOut(28)), muxMemOut);
 
-  ryOut <= ryOutput;
-  raOut <= RAOutput;
-  rbOut <= RBOutput;
-  muxBOut <= MuxBOutput;
-  pcOutput <= pcOut;
-  instructionOut <= instruction;
-  mem_writeOut <= mem_write;
-  ma_selectOut <= ma_select;
-  muxMaSelectOutput <= muxMaSelectOut;
-  rmOutput <= rmOut;
-  psOutput <= psOut;
-  rfwriteOutput <= rf_write;
+  --ryOut <= ryOutput;
+  --raOut <= RAOutput;
+  --rbOut <= RBOutput;
+  --muxBOut <= MuxBOutput;
+  --pcOutput <= pcOut;
+  --instructionOut <= instruction;
+  --mem_writeOut <= mem_write;
+  --ma_selectOut <= ma_select;
+  --muxMaSelectOutput <= muxMaSelectOut;
+  --rmOutput <= rmOut;
+  --psOutput <= psOut;
+  --rfwriteOutput <= rf_write;
+  --rzOutputput <= RZOutput;
+
+  --ioMemoryWrite <= ((muxMaSelectOut(31) or muxMaSelectOut(30) or muxMaSelectOut(29) or muxMaSelectOut(28)) and mem_write);
+  --mainMemoryWrite <= (((not muxMaSelectOut(31)) and (not muxMaSelectOut(30)) and (not muxMaSelectOut(29)) and (not muxMaSelectOut(28))) and mem_write);
 
 
 END behaviour;

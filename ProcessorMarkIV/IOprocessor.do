@@ -5,7 +5,7 @@ add wave clock
 add wave reset
 add wave -dec raOut
 add wave -dec rbOut
-add wave -dec ryOut
+add wave -dec rzoutputput
 add wave muxbout
 add wave -hex pcoutput
 add wave -hex instructionout
@@ -15,6 +15,9 @@ add wave -dec muxMaSelectOutput
 add wave -dec rmOutput
 add wave psOutPut
 add wave rfWriteOutput
+add wave mainMemoryWrite
+add wave ioMemoryWrite
+
 
 add wave KEY
 add wave SW
