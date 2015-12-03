@@ -16,3 +16,4 @@ incremental_db/
 __pycache__/
 Assembler/test.o
 Assembler/test.s
+*.cdf
