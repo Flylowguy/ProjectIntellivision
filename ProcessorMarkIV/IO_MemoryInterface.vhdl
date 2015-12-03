@@ -16,6 +16,8 @@ ENTITY IO_MemoryInterface IS
 		mem_addr :  IN  STD_LOGIC_VECTOR(3 DOWNTO 0);
 		mem_data :  IN  STD_LOGIC_VECTOR(31 DOWNTO 0);
 		SW :  IN  STD_LOGIC_VECTOR(9 DOWNTO 0);
+		mainMem_write	:OUT STD_LOGIC;
+		muxMemSel			:OUT STD_LOGIC;
 		data_out :  OUT  STD_LOGIC_VECTOR(31 DOWNTO 0);
 		HEX0 :  OUT  STD_LOGIC_VECTOR(6 DOWNTO 0);
 		LEDG :  OUT  STD_LOGIC_VECTOR(7 DOWNTO 0)
@@ -30,12 +32,23 @@ COMPONENT reg32_IO
 		 q : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
 	);
 end COMPONENT;
-
 COMPONENT mux2
 	PORT(
 		d0,d1	:IN std_logic_vector(31 downto 0);
 		sel								:IN std_logic;
 		f									:OUT std_logic_vector(31 downto 0)
+	);
+end COMPONENT;
+COMPONENT decoder32
+	PORT(
+		  Sel		:IN std_logic_vector(4 downto 0);
+		  Output :OUT std_logic_vector(31 downto 0)
+	);
+end COMPONENT;
+COMPONENT and1_2
+	PORT(
+			A,B		:IN std_logic;
+			output	:OUT std_logic
 	);
 end COMPONENT;
 
@@ -49,10 +62,14 @@ SIGNAL	SYNTHESIZED_WIRE_2 :  STD_LOGIC_VECTOR(31 DOWNTO 0);
 SIGNAL	SYNTHESIZED_WIRE_8 :  STD_LOGIC;
 SIGNAL	SYNTHESIZED_WIRE_5 :  STD_LOGIC;
 
-
+SIGNAL address : std_logic_vector(4 DOWNTO 0);
+SIGNAL decoderOutput : std_logic_vector(31 DOWNTO 0);
 BEGIN
 
-
+--Decoder to contorl write signals:
+decoder : decoder32 PORT MAP(address, decoderOutput);
+muxMemSel <= decoderOutput(0);
+andWrite : and1_2 PORT MAP(decoderOutput(0), mem_write, mainMem_write);
 
 b2v_HEX_DISPLAY : reg32_IO
 PORT MAP(clock => SYNTHESIZED_WIRE_0,
@@ -71,10 +88,10 @@ SYNTHESIZED_WIRE_8 <= NOT(clock);
 
 
 
-SYNTHESIZED_WIRE_5 <= SYNTHESIZED_WIRE_8 AND mem_write AND mem_addr(0);
+SYNTHESIZED_WIRE_5 <= SYNTHESIZED_WIRE_8 AND mem_write AND decoderOutput(1);
 
 
-SYNTHESIZED_WIRE_0 <= SYNTHESIZED_WIRE_8 AND mem_write AND mem_addr(1);
+SYNTHESIZED_WIRE_0 <= SYNTHESIZED_WIRE_8 AND mem_write AND decoderOutput(2);
 
 
 b2v_LED : reg32_IO
@@ -97,6 +114,7 @@ PORT MAP(clock => SYNTHESIZED_WIRE_8,
 HEX0(6 DOWNTO 0) <= hex_data(6 DOWNTO 0);
 LEDG(7 DOWNTO 0) <= led_data(7 DOWNTO 0);
 
-push(3 DOWNTO 0) <= KEY;
+push(3 DOWNTO 0) <= (NOT KEY);
 switch(9 DOWNTO 0) <= SW;
+address(3 DOWNTO 0) <= mem_addr;
 END bdf_type;

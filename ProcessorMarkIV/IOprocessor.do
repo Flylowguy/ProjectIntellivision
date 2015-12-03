@@ -2,32 +2,21 @@ vsim processor
 view wave
 
 add wave clock
-add wave reset
-add wave -dec raOut
-add wave -dec rbOut
-add wave -dec rzoutputput
-add wave muxbout
-add wave -hex pcoutput
+add wave -hex raOut
+add wave -hex rbOut
+add wave -hex rdOut
 add wave -hex instructionout
-add wave mem_writeOut
-add wave ma_selectOut
-add wave -dec muxMaSelectOutput
-add wave -dec rmOutput
-add wave psOutPut
-add wave rfWriteOutput
-add wave mainMemoryWrite
-add wave ioMemoryWrite
-
+add wave -hex muxMOut
+add wave -hex muxMSel
+add wave psOutput
 
 add wave KEY
 add wave SW
 add wave LEDG
 add wave HEX
 
-force KEY 0100 0
+force KEY 1011 0
 
-force clock 0 0, 1 50 -repeat 100
-force reset 0 0
+force clock 0 0, 1 1000 -repeat 2000
 
-
-run 10000
+run 200000
