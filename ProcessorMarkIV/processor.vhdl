@@ -7,7 +7,7 @@ ENTITY processor IS
   KEY         :IN std_logic_vector(3 DOWNTO 0);
   SW          :IN std_logic_vector(9 DOWNTO 0);
   LEDG        :OUT std_logic_vector(7 DOWNTO 0);
-  HEX         :OUT std_logic_vector(6 DOWNTO 0)
+  HEX0        :OUT std_logic_vector(6 DOWNTO 0)
 );
 END processor;
 
@@ -163,6 +163,7 @@ SIGNAL psOut :std_logic_vector(3 downto 0);
 SIGNAL MuxCOutput :std_logic_vector(4 DOWNTO 0);
 SIGNAL RZOutput, RAOutput, RBOutput, MuxBOutput, dataS, dataT, ZEROS, aluOut, MuxYOutput, RYOutput, instruction, immediate1s, immediate2s, muxIncOut, pcAdderOut, pcOut, pcIn :std_logic_vector(31 downto 0);
 SIGNAL muxMaSelectOut, rmOut, memoryOut, pcTempOut, regDataIN, IO_InterfaceOut, muxMemOut : STD_LOGIC_VECTOR(31 downto 0);
+SIGNAL HEX :STD_LOGIC_VECTOR(29 DOWNTO 0);
 BEGIN
 
   ZEROS <= (OTHERS =>'0');
@@ -220,11 +221,15 @@ BEGIN
 
   --IO_And2 : and1_2 PORT MAP(and1Out, mem_write, and2Out);
 
-  IO_MemoryInterface1: IO_MemoryInterface PORT MAP(clock, ((muxMaSelectOut(31) or muxMaSelectOut(30) or muxMaSelectOut(29) or muxMaSelectOut(28)) and mem_write), KEY, muxMaSelectOut(31 DOWNTO 28), rmOut, SW, IO_InterfaceOut, HEX, LEDG);
+  IO_MemoryInterface1: IO_MemoryInterface PORT MAP(clock, ((muxMaSelectOut(31) or muxMaSelectOut(30) or muxMaSelectOut(29) or muxMaSelectOut(28)) and mem_write), KEY, muxMaSelectOut(31 DOWNTO 28), rmOut, SW, IO_InterfaceOut, HEX0, LEDG);
 
   --IO_Or2  : or1_4 PORT MAP(muxMaSelectOut(31), muxMaSelectOut(30), muxMaSelectOut(29), muxMaSelectOut(28), or2Out);
 
   muxMem : mux2 PORT MAP(memoryOut, IO_InterfaceOut, (not rmOut(31)) and (not rmOut(30)) and (not rmOut(29)) and (not rmOut(28)), muxMemOut);
+
+  --HEX3 <= HEX(29 DOWNTO 22);
+  --HEX2 <= HEX(21 DOWNTO 14);
+  --HEX1 <= HEX(13 DOWNTO 7);
 
   --ryOut <= ryOutput;
   --raOut <= RAOutput;
