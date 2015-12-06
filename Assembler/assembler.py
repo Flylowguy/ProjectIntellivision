@@ -143,13 +143,13 @@ def pass2(fileName, symbolTable):
                     outLine = binaryChange(int(lineArgs[3]),23)
                     outLine += Cond[lineArgs[2]] + Btype[lineArgs[1]]
             elif(lineArgs[1] in Jtype):
-                if(lineArgs[2] in symbolTable):
-                    jumper = symbolTable[lineArgs[2]]
-                    jumper = jumper - count -1
+                if(lineArgs[3] in symbolTable):
+                    #label j al label
+                    jumper = symbolTable[lineArgs[3]]
                     outLine = binaryChange(jumper,27)
                     outLine += Jtype[lineArgs[1]]
                 else:
-                    outLine = binaryChange(lineArgs[2],27)
+                    outLine = binaryChange(lineArgs[3],27)
                     outLine += Jtype[lineArgs[1]]
             elif(lineArgs[1] == 'nop'):
                 outLine = '0' * 32
@@ -211,13 +211,13 @@ def pass2(fileName, symbolTable):
                     outLine = binaryChange(lineArgs[2],23)
                     outLine += Cond[lineArgs[1]] + Btype[lineArgs[0]]
             elif(lineArgs[0] in Jtype):
-                if(lineArgs[1] in symbolTable):
-                    jumper = symbolTable[lineArgs[1]]
-                    jumper = jumper - count -1
+                if(lineArgs[2] in symbolTable):
+                    #j al label
+                    jumper = symbolTable[lineArgs[2]]
                     outLine = binaryChange(jumper,27)
                     outLine += Jtype[lineArgs[0]]
                 else:
-                    outLine = binaryChange(lineArgs[1],27)
+                    outLine = binaryChange(lineArgs[2],27)
                     outLine += Jtype[lineArgs[0]]
             elif(lineArgs[0] == 'nop'):
                 outLine = '0' * 32
@@ -229,7 +229,7 @@ def pass2(fileName, symbolTable):
         if(len(outPrinter) <8):
             outPrinter = '0'*(8-len(outPrinter)) + outPrinter
         print(outPrinter)
-        outFile.write('      '+outPrinter+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
+        outFile.write('      ' + outPrinter+'\n')#converts the binary to int, the int to it's hex rep then removes the beginning 0x
     print(fileName +' is done assembling\n')
     myfile.close()
     outFile.close()
@@ -262,5 +262,8 @@ def binaryChange(number,leng):
 
 #TODO call that will asseble the whole file
 def assemble(fileName):
+    print('The hex commands for ' + fileName+ ' are:')
     pass2(fileName,pass1(fileName)) # assemble that file!
     return # ends the function
+
+assemble(sys.argv[1])
